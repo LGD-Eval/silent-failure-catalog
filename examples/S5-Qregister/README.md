@@ -47,13 +47,44 @@ invisibility.
 |---|---|---|
 | `I0-ordinary` | Q1/Q2/Q4 `CAPABILITY_ABSENT` — no semantic basis object at all (S5 §10.1) | stale patch **executes during the breach** |
 | `I1-defended` | Q2 passes superficially; Q3 reads a 5-minute cache, Q4 omits the superseding generation — `CONTROL_EXECUTED_FAILED` (S5 §10.2) | stale patch **executes during the breach** |
-| `I2-complete` | every gate evidenced incl. Q6 recheck-to-act binding | **REASSESS → blocked** |
+| `I2-complete` | the selected branches' gates evidenced **within the supplied model**, incl. Q6 recheck-to-act binding | **REASSESS → blocked** |
 
 > **Naming note:** `I0/I1/I2` here are **local simulation profiles** of this
 > example only. They are distinct from T08's `AWS-I2` walkthrough (the *same
 > strong implementation retained under context drift*), which this example
 > does not claim to implement; `I2-complete` corrects selected known branches
 > inside a documentary evaluator, nothing more.
+
+### Claim scope: enforced here vs. assumed upstream
+
+Consistent with the naming note, `I2-complete` is complete **for its selected
+illustrative branches only**. The following predicates are **not** enforced by
+this decision module; an upstream collector would have to supply or guarantee
+them:
+
+- **Q0 current authority** — `authority_state` is carried on the observation
+  and echoed in the trace, but no predicate reads it; a revoked or
+  wrong-principal grant does not change the ruling.
+- **Q1 reconstructable basis** — the trace asserts reconstructability; the
+  incident record, diagnosis and full intervention history are not verified
+  by this module.
+- **Q2 use-time reassessment** — rulings operate on the already-supplied
+  `Observation`; acquiring and qualifying the live observation is upstream.
+- **Q3 authoritative freshness** — `source_available` is checked, but
+  `source_version` and the age of `observed_at` are not validated, so an
+  available-but-obsolete source retains the clean result (the README's Q3
+  simplification is deliberate).
+- **Q4 later supersession** — requalification triggers on a *complete
+  supplied* `supersession_lineage`; lineage completeness is not independently
+  established.
+- **Q5 bounded response** — a missing source yields `HOLD_ESCALATE`; owner,
+  deadline and unaffected parallel work remain textual, not observed
+  processes.
+- **Q6 check-to-act** — freeze-window detection works within the supplied
+  model; independently learned unannounced events and binding enforcement are
+  not established. The example actuator deterministically applies every
+  attempted write, so rejected/partial/delayed/bypass effects and the
+  independent service-impact predicate are out of scope.
 
 ## Fixture branches, with Patch B and the freeze decoupled
 
