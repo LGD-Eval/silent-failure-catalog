@@ -7,7 +7,9 @@ Entries are append-only. A retired entry is marked `deprecated` and kept online.
 
 ## [Unreleased]
 
-Gates 9 and 10, three new hard rules, and the closure of an external review round.
+## [0.1.3] - 2026-10-11
+
+Gates 9 and 10, three new hard rules, the closure of an external review round, and the clinical-delegation transfer proof.
 
 ### Added
 
@@ -40,9 +42,17 @@ Gates 9 and 10, three new hard rules, and the closure of an external review roun
   correction closes the loop), **rule 15** (a count is stated once), and a **Gate 0** section.
 - A **gate-count consistency check** in `tools/verify_release_consistency.py`: a live document
   that states a gate count must agree with `.githooks/pre-commit` (the single source).
+- **`examples/clinical-handoff/`** — the fail-closed authority-preservation gate ported to a high-stakes clinical-delegation context, where authority is laundered across a context handoff; a selftest asserts four mutant-kills and a negative-control, mirroring the S5-Qregister and T08-S5Q2 examples.
 
 ### Changed
 
+- **`examples/S5-Qregister/README.md`**: the `I2-complete` row no longer reads as a claim
+  about every gate in the pipeline — it is scoped to "the selected branches' gates evidenced
+  **within the supplied model**" — and a new **Claim scope: enforced here vs. assumed
+  upstream** section names the Q0-Q6 predicates this decision module does not enforce (an
+  authority state that is carried but never read; lineage completeness assumed rather than
+  established; an actuator that applies every attempted write). The row and the section state
+  the same claim, so they change together.
 - `.githooks/pre-commit`, `.github/workflows/gates.yml` and `AGENTS.md` no longer restate a
   gate count; they point at the hook. The stale "seven gates" literal is gone.
 - `README.md` and `index.md` corrected; the defect count now points at its source.
