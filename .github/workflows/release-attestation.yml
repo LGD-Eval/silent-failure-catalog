@@ -1,0 +1,48 @@
+name: release-attestation
+
+# G-07/G-26 five-piece set, piece 5: signed build provenance for the
+# published tree. This repository ships no package; the release subjects are
+# the published source tree archive and the content manifest, both OIDC-signed
+# with SLSA build provenance so a cited tag can be verified as having been
+# built by this repository's Actions.
+# Pinned actions to commit SHAs (Scorecard Pinned-Dependencies).
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  attest:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Prepare release subjects (published tree + content manifest)
+        run: |
+          tar -czf release-source.tar.gz --exclude=.git --exclude=.github .
+          sha256sum release-source.tar.gz > release-source.tar.gz.sha256
+
+      - name: Attest published tree
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8
+        with:
+          subject-path: release-source.tar.gz
+
+      - name: Attest content manifest
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8
+        with:
+          subject-path: manifest.sha256
+
+      - name: Upload attested subjects
+        uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874
+        with:
+          name: release-attestation-subjects
+          path: |
+            release-source.tar.gz
+            release-source.tar.gz.sha256
