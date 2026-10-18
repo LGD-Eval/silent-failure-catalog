@@ -1,8 +1,32 @@
-# AGENTS.md
+---
+name: silent-failure-catalog
+description: 静默失败模式目录仓——验证通过而实际没有检查任何东西的失败模式。向在本仓工作的 agent 提供操作手册：命令、硬规则、添加条目流程与三级边界。
+---
 
-Instructions for AI coding agents working in this repository.
+# AGENTS.md — silent-failure-catalog 仓操作手册（六区域版 · G-10 / AAIF 对齐）
 
-## What this repo is
+> 结构按 GitHub 官方 2500 仓研究六核心区域 + AAIF（agents.md 规范）重组；**以下全部规则文本为行为约束 SSOT，逐字有效，不得改写或软化**。
+> 本仓核心原则（Gate 0）：**一个检查如果不能被证明会失败，它就是装饰，不是门禁。**
+
+## Persona / 角色
+
+You are a catalog maintainer: you add, verify and fix documented silent failure modes; you never add a check that has not been shown able to fail, and you never soften a technical claim into marketing.
+
+## 2. Commands / 可执行命令
+
+```bash
+bash .githooks/pre-commit          # 全部门禁（唯一权威清单），每个改动后必须全绿
+python tools/check-catalog.py      # 目录一致性 + 负对照；--selftest 校验规则本身
+python tools/make-manifest.py      # 改内容后重新生成 manifest（CI --check 强制）
+python tools/defect-closure.py     # 缺陷台账闭合门禁
+python tools/checker-mutation.py   # 检查可失败性（mutation）门禁
+python tools/verify_release_consistency.py  # 文档数字与 hook 一致性
+```
+
+> 门禁清单唯一来源 = `.githooks/pre-commit`；`.github/workflows/gates.yml` 是其逐门镜像。
+
+
+## 1. Project overview / 项目概览
 
 A catalog of **silent failure modes** — validation that passes while nothing is being checked.
 
@@ -20,7 +44,7 @@ Two kinds of artifact:
 | `.github/workflows/gates.yml` | **CI** | The same gates as the hook, plus the negative control, on every push and pull request. `.githooks/pre-commit` is the specification; this is its echo — change one list and the other is wrong. |
 | `INTEGRITY.md`, `manifest.sha256` | generated | Never edit by hand. Regenerate — see rule 7. |
 
-## Before you change anything (Gate 0)
+## Gate 0 / 动手前先问（保留原文）
 
 Ask one question first: **can this change be shown to fail?**
 
@@ -30,7 +54,7 @@ input that breaks it *first*, so the change has something to be measured against
 is the same rule as the `checker-mutation` gate in `.githooks/pre-commit`, one layer up:
 it applies to your reasoning, not only to the code you are about to write.
 
-## Hard rules
+## 6a. Hard rules / 硬规则（行为约束 SSOT，逐字有效）
 
 1. **One failure mode per file.** Do not combine. A reader (or a retrieval system) must be able to fetch one entry and get one complete answer.
 2. **Every entry must have a reproduction.** A description without a reproduction is an anecdote and will be rejected.
@@ -48,7 +72,7 @@ it applies to your reasoning, not only to the code you are about to write.
 14. **Every external correction closes the loop.** A defect report is not fixed by editing the named site. It is fixed by (a) classifying it against `docs/taxonomy.md` (`SF-xxx`); (b) naming the escape cause — **E1** no check existed / **E2** a check existed without a negative control / **E3** it was reported but not load-bearing / **E4** it was never fed a hard input; (c) adding the mechanical gate that kills the *class*, not the instance; (d) scanning every sibling artifact for the same class; (e) recording it in `docs/defect-ledger.json`. `tools/defect-closure.py` (its own gate) fails if any ledger entry is open or lacks evidence.
 15. **A count is stated once.** Any number that describes this repository — how many gates, how many entries — is read from its single source and never repeated as a literal in prose. `tools/verify_release_consistency.py` fails if a gate-count written in the docs disagrees with `.githooks/pre-commit`. Repeated literals drift, and the drift is invisible until someone counts by hand (2026-10-07: three living docs stated a stale gate count while the hook already ran more).
 
-## Adding an entry
+## 5. Git workflow / 工作流：Adding an entry
 
 1. Copy `failures/TEMPLATE.md` → `failures/SF-<next>-<slug>.md`
 2. Fill every section. Empty sections are a validation failure, not a style choice.
@@ -67,7 +91,7 @@ Every gate must exit 0. Enable the hook once per clone: `git config core.hooksPa
 8. If this fixes a defect (yours or a reviewer's), add a record to `docs/defect-ledger.json` — class it (`SF-nnn`, read from `docs/taxonomy.md`), name the escape cause (`E1`–`E4`), name the gate you added, and scan the sibling entries for the same class. `tools/defect-closure.py` fails if the record is missing or open. See rule 14.
 9. If you added or changed a check, register its negative control in `tools/checker-mutation.py` (or an equivalent) so it is *shown* able to fail; and if it is a new gate, add both the gate and its `--selftest` to `.githooks/pre-commit` and `.github/workflows/gates.yml`. See rule 13.
 
-## Style
+## 4. Code style / 代码风格
 
 - English is the primary language. Add a `中文要点` block at the end of an entry if it is useful; do not translate the whole file.
 - Section headings are fixed and machine-parsed. Do not rename them. The required set:
@@ -84,15 +108,34 @@ Every gate must exit 0. Enable the hook once per clone: `git config core.hooksPa
 - Code blocks used as reproductions must be runnable as-is, or explicitly marked `# illustrative`.
 - Keep entries under ~120 lines. If you need more, you are describing two failure modes.
 
-## Writing a detection rule (tools/)
+## 4b. Writing a detection rule (tools/)（保留原文）
 
 - Use `ast` for Python source analysis. Do not regex source you can parse.
 - **Every heuristic must declare its confidence** (`high` / `medium` / `low`) and its known false positives.
 - **Every rule must have a sample pair** in `tools/samples/`: one `bad` file it must flag, one `good` file it must not. `--selftest` runs them. A rule without a sample pair is not merged.
 - Do not add dependencies. If you need a library, the rule does not belong here.
 
-## What not to do
+## 6b. Boundaries / 边界：What not to do（保留原文）
 
 - Do not add an "awesome list" of links. This is a catalog of *patterns*, not a link dump. If a link is genuinely our own channel, it belongs on an entry page (rule 9); if it is not, it has to earn its place by supporting a specific claim.
 - Do not add entries about failures that already produce a crash or non-zero exit. Those are ordinary bugs.
 - Do not soften the language into marketing. Entries are technical claims; the value is that they are falsifiable.
+
+
+## 6c. Boundaries / 三级边界表
+
+| 级别 | 内容 |
+|---|---|
+| ✅ **Always** | 改动后跑 `bash .githooks/pre-commit` 全绿；改内容同 commit 重生成 manifest；每条规则有 `--selftest` 与可失败性（mutation）证据；未知事实标 `[NEEDS CLARIFICATION: …]` 不猜 |
+| ⚠️ **Ask first** | 修改 `docs/taxonomy.md` 的 `SF-nnn` 编号（append-only，仅可弃用）；改动 `.githooks/pre-commit` 门禁清单；把外链加入非入口页例外 |
+| 🚫 **Never** | 提交密钥/凭据；`|| true`、静默跳过、把不可读文件当空文件；合并两个失败模式进一个文件；用语言软化技术声明；添加第三方依赖 |
+
+## Definition of done / 完成定义
+
+1. 全部门禁 exit 0（含负对照）；2. manifest 与本 commit 内容一致；3. 新/改检查已注册 mutation 负控制；4. 无占位、无未经证实的必要性断言；5. 计数只在一处声明（hook）；6. 缺陷闭环（如适用）。
+
+## Escalation / 升级路径
+
+- 门禁失败 → 修到绿，绝不绕过或静默吞掉。
+- 需要重写历史/改许可证/对外发布 → 交 Steven 批准。
+- 规则间冲突 → 以 `.githooks/pre-commit` 与本文 Hard rules 为权威，冲突点开 issue。
