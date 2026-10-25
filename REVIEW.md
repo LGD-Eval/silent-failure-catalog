@@ -183,3 +183,7 @@ the question MedXpertQA's own multi-round expert review implicitly depends on.
 ---
 
 © 2026 赵兴华 / Steven Zhao·China · Code [MIT](LICENSE) · Content [All Rights Reserved](LICENSE-CONTENT)
+
+- Deliberately not done: no GitHub Release was created for `v0.1.1`. The repository's
+  `zenodo-deposit.yml` triggers on `release: [published]` and would auto-publish a new
+  Zenodo DOI, which cannot be withdrawn. The tag alone is the canonical, citable snapshot.
