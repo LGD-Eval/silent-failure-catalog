@@ -1,3 +1,5 @@
+Silent failures are what the LGD Three Laws （有籍·有证·有门禁 / registered · evidenced · gated) are built to catch — for where this catalog sits among the projects, and how to arrive at it from any of them, see [`docs/start-here.md`](docs/start-here.md) and [`docs/where-to-find-us.md`](docs/where-to-find-us.md).
+
 <div align="center">
 
 # Silent Failure Catalog
@@ -8,7 +10,7 @@
 
 [![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
 [![Content: All Rights Reserved](https://img.shields.io/badge/content-All%20Rights%20Reserved-lightgrey.svg)](LICENSE-CONTENT)
-[![Entries](https://img.shields.io/badge/entries-14-14B8A6)](failures/)
+[![Entries](https://img.shields.io/badge/entries-15-14B8A6)](failures/)
 [![Zero dependency](https://img.shields.io/badge/deps-stdlib%20only-0B1F3A)](#quick-start)
 <!-- The gate runs in CI now, so the badge below can point at a run that exists.
      It was withheld until it did: a badge claiming a validation run that does not
@@ -37,7 +39,7 @@
   引用时请同时标注仓库名、原文链接 `https://github.com/zhaoxinghua09-cell/silent-failure-catalog`
   与权利人「赵兴华 / Steven Zhao·China」。
 - **完整条款**：代码见 [LICENSE](LICENSE)（MIT）；内容见 [LICENSE-CONTENT](LICENSE-CONTENT)（**保留所有权利**，注明出处可引用）。
-- **联系**：zhaoxinghua09@gmail.com ｜ ORCID 0009-0001-0512-1237 <!-- leak-scan: allow — the maintainer's published contact address; deliberate, not a leak -->
+- **联系**：zhaoxinghua09 [at] gmail [dot] com ｜ ORCID 0009-0001-0512-1237 <!-- leak-scan: clean — contact obfuscated 2026-10-23 per owner decision -->
 - **品牌状态限定**：MedXpert、SynomosAI、LGD 等为相关项目标识，
   **均未申请实体注册、未申请商标注册**；出现仅作来源标识，
   不构成对法人实体或商标权的任何主张。
@@ -104,7 +106,7 @@ python tools/gate-lint.py --selftest      # proves the linter itself works
 | **B · Uncounted Absence** | Something required is missing, and missing does not count as failure | [SF-005](failures/SF-005-neutral-marker-not-counted.md) · [SF-006](failures/SF-006-undeclared-not-checked.md) · [SF-007](failures/SF-007-empty-value-is-silent.md) |
 | **C · Wrong Evidence** | The signal used cannot prove the conclusion drawn from it | [SF-008](failures/SF-008-loading-artifact-as-evidence.md) · [SF-009](failures/SF-009-exposure-counted-as-usage.md) · [SF-010](failures/SF-010-local-green-not-remote-green.md) |
 | **D · Drifting Oracle** | The check itself degrades — exemption, substring match, mis-attribution | [SF-011](failures/SF-011-always-green-oracle.md) · [SF-012](failures/SF-012-misattributed-failure.md) |
-| **E · Process & Environment** | The failure lives outside the logic: stale artifacts, zombie processes | [SF-013](failures/SF-013-stale-copy-contaminates-check.md) · [SF-014](failures/SF-014-zombie-process-looks-alive.md) |
+| **E · Process & Environment** | The failure lives outside the logic: stale artifacts, zombie processes | [SF-013](failures/SF-013-stale-copy-contaminates-check.md) · [SF-014](failures/SF-014-zombie-process-looks-alive.md) · [SF-015](failures/SF-015-stale-reference-rot.md) — stale reference: citations rot when the cited state moves |
 
 → Full taxonomy with the shared root cause: [`docs/taxonomy.md`](docs/taxonomy.md)
 
