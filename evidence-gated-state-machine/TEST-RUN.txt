@@ -1,4 +1,4 @@
-﻿=== RUN 1: evidence_gated_state_machine.py ===
+=== RUN 1: evidence_gated_state_machine.py ===
 == evidence_gated_state_machine - self-check ==
   [PASS] entity registration spine: 4 entities registered, chain verifiable
   [PASS] evidence-gated transition (model update, evidence met): GRANTED

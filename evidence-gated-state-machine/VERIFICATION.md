@@ -22,8 +22,38 @@ able to fail) exposed a real defect in the earlier version of
   registered entity's data after registration was never detected.
 - **Fix:** `verify_chain()` now recomputes each link **without side effects**
   (plain `hashlib.sha256` over the current payload) and compares against the
-  stored hash. Tampering is now detected.
+  stored hash. In-place tampering with a registered entity's fields is now
+  detected.
 - **Impact on normal path:** none — the 7 self-checks still pass, exit code 0.
+
+## What this fix does not cover (measured 2026-10-28)
+
+The fix closes one vector, and this record used to stop at "tampering is now
+detected", which an independent review measured as too wide. Three further
+vectors survive in this version, each reproduced on the published artefact:
+
+- deleting the last registered entity leaves `verify_chain()` true (the walk
+  covers `self.entities`, never `self.chain`, so chain length is not compared
+  against the number of registration events);
+- `chain.append(...)` after registration leaves `verify_chain()` true, same
+  cause;
+- tampering with an entity and then re-registering it recomputes a consistent
+  hash, and no append-only record of prior hashes exists to contradict it.
+
+They are recorded as open defects in the repository's defect ledger, not
+resolved here. Read the sentence above as "in-place modification is detected",
+not as "the chain is tamper-proof".
+
+## This artefact is executed by the repository's gate list
+
+Added 2026-10-28. Before this, all seventeen gates ran without ever executing
+this folder: a marker side effect planted in the implementation was seen by none
+of them, and replacing `verify_chain()` with `return True` still let
+`.githooks/pre-commit` print `all gates passed`. `tools/state-machine-negative-control.py`
+now runs the demonstration, requires the negative control to bite, and kills two
+mutants in a throw-away copy — including that exact `return True` edit. Its
+output also prints the three vectors above as declared non-coverage, so the
+gate states what it does not see instead of implying it sees everything.
 
 ## Reproduction four-tuple
 

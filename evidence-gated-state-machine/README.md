@@ -18,6 +18,39 @@ formal Input Document for the 1st FG-TIDA Meeting, Paris, 30 Nov – 1 Dec 2026)
 | `demo_tamper_check.py` | Negative control (QC-07): proves tampering with registered data is detected |
 | `VERIFICATION.md` | Fix record (pre/post SHA, four-tuple, defect description, worked example) |
 | `TEST-RUN.txt` | Captured full test run: 7 PASS + negative control, with exit codes |
+| `LICENSE` | Apache-2.0 — the licence this folder's files declare in their headers. The repository root carries MIT for the rest of the corpus; this folder is separately licensed on purpose and says so here. |
+
+## Known limits (measured, not asserted)
+
+An independent review on 2026-10-28 executed this folder against adversarial
+edits. Five limits were measured and are listed rather than left to be
+discovered by a reader who trusts the code:
+
+1. `verify_chain()` walks the registered entities and compares each against the
+   hash stored at registration. It does **not** compare the chain length against
+   the number of registration events, so **deleting the last registered entity
+   still verifies true**, and so does appending an entry directly to `chain`.
+2. Tampering with an entity and then re-registering it recomputes a consistent
+   hash; with no append-only record of prior hashes, the tamper becomes
+   invisible.
+3. Expiry comparison is a string comparison, not a parsed-date comparison, so
+   mixed date formats (`2026-9-1` vs `2026-10-01`) can be ordered wrongly and
+   silently.
+4. `human_authorized` is a boolean the caller supplies. It records that a
+   decision was made; it carries no approver identity, signature or receipt
+   hash, so it is not authentication.
+5. Receipts accumulate in memory and are not written to the chain, so they are
+   not tamper-evident.
+
+These are limits of a **demonstration of expressibility**, which is what this
+folder claims to be. They are not limits of the proposal: each names a
+requirement the full construct must meet, and each is tracked in the
+repository's defect ledger rather than described away here.
+
+What the folder does now prove, and did not before: the repository gate list
+**executes** this code (`tools/state-machine-negative-control.py`), and that
+gate kills a copy of the implementation whose verifier is reduced to
+`return True`. Before the gate existed, that exact edit passed every check.
 
 ## Reproduce
 
