@@ -175,6 +175,14 @@ run() {
         echo "pre-commit: FAIL — $name" >&2
         printf '%s\n' "$out" | sed 's/^/    /' >&2
         fail=1
+    else
+        # A silent success is this repository's own subject: "the run where you
+        # forgot looks exactly like the run where everything passed". The hook
+        # used to print one line for eighteen gates, so "18 passed" could not be
+        # read off the output -- an independent seat asked in as many words
+        # whether the count was verifiable, and it was not. One line per gate
+        # costs nothing and makes the count a thing you can see.
+        echo "  PASS  $name"
     fi
 }
 

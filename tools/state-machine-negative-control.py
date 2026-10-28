@@ -69,7 +69,15 @@ the gate measures the harness, not the defect backlog.
 Mutations asserted (each must be killed)
 ----------------------------------------
   M1  `verify_chain()` reduced to an unconditional `return True`. This is the
-      exact edit that survived all seventeen gates on 2026-10-28.
+      exact edit that survived all seventeen gates on 2026-10-28 -- with one
+      precision that matters and is easy to lose in the retelling: the byte gates
+      (5 and 6) DO notice the edit, so the "legal flow" that produced an
+      all-green tree included regenerating `manifest.sha256` afterwards, which is
+      what this hook's own failure message tells the author to do. The blind spot
+      was never "nobody noticed the bytes changed"; it was that **no gate asks
+      what the code does**. Rebuilding the manifest is a sanctioned step, so the
+      sanctioned flow erases the only signal, and the tree goes green with the
+      verifier hollowed out.
   M2  `version` is dropped from the hashed payload on both sides (registration
       and verification), so in-place version tampering leaves a consistent hash.
       A single-site edit would break the baseline instead of the detector, which
@@ -251,6 +259,16 @@ def run_gate(artifact_dir):
                 continue
 
             code, out = _run_py(DEMO, work)
+            if not baseline_ok:
+                # The unmutated tree is already red, so this mutant's exit code
+                # says nothing about the mutant: the control would have failed
+                # anyway. Reporting "killed" here is the exact error this gate's
+                # own M2 docstring warns about -- a mutant "killed" by a detector
+                # that was already broken. Reported, not counted; P2 already
+                # failed, so the gate is red regardless.
+                print("   %-3s %-40s not attributable (baseline already red, exit %d)"
+                      % (label, description, code))
+                continue
             if code != 0:
                 print("   %-3s %-40s killed (control exit %d)" % (label, description, code))
             else:
